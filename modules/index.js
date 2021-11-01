@@ -1,16 +1,15 @@
 import { all, fork } from "redux-saga/effects";
 import { combineReducers } from "redux";
-// import requests, { requestSagas } from "./common/request";
-// import loading from "./common/loading";
+import requests, { requestSagas } from "./common/request";
+import loading from "./common/loading";
 
 const rootReducer = combineReducers({
-  // loading,
-  // ...requests,
+  loading,
+  ...requests,
 });
 
 export function* rootSaga() {
-  // yield all([...requestSagas.map((f) => fork(f))]);
-  yield all([]);
+  yield all([...requestSagas.map((f) => fork(f))]);
 }
 
 export default rootReducer;
