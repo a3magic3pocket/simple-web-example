@@ -20,7 +20,6 @@ export default function useForm({ initialValues, onSubmit, validate }) {
 
   useEffect(() => {
     if (submitting) {
-      console.log("errors", errors)
       if (Object.keys(errors).length === 0) {
         onSubmit(values);
       }

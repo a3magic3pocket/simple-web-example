@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DefaultButton } from "./common/button";
 import { DefaultLayout } from "./common/layout";
 import { useRouter } from "next/router";
@@ -8,6 +8,21 @@ import Image from "next/image";
 export default function Header({ isLoading }) {
   const [isLogged, setIsLogged] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    window.addEventListener("storage", function() {
+      const a = localStorage.getItem("login")
+      console.log("a", a)
+    }, false)
+  })
+
+  const handleLogin = () => {
+    const new_window = window.open(
+      "//localhost:8080/login?redirect-url=localhost:3000/check",
+      "SIMPLE-LOCKER login",
+      "scrollbars=no,width=320,height=400,menubar=false,resizable=yes"
+    );
+  };
 
   return (
     <HeaderWrapper>
@@ -33,7 +48,7 @@ export default function Header({ isLoading }) {
             {isLogged ? (
               <LogoutButton>로그아웃</LogoutButton>
             ) : (
-              <LoginButton>로그인</LoginButton>
+              <LoginButton onClick={() => handleLogin()}>로그인</LoginButton>
             )}
           </HeaderAuthWrapper>
         </HeaderContentWrapper>
