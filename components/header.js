@@ -3,20 +3,31 @@ import { useState } from "react";
 import { DefaultButton } from "./common/button";
 import { DefaultLayout } from "./common/layout";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
-export default function Header() {
+export default function Header({ isLoading }) {
   const [isLogged, setIsLogged] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <HeaderWrapper>
       <DefaultLayout>
         <HeaderContentWrapper>
-          <Logo onClick={() => router.push("/")}>
-            SIMPLE
-            <br />
-            LOCKER
-          </Logo>
+          <LogoWrapper>
+            <Logo onClick={() => router.push("/")}>
+              SIMPLE
+              <br />
+              LOCKER
+            </Logo>
+            {isLoading && (
+              <StyledLoading
+                src="/loading.gif"
+                width="43px"
+                height="43px"
+                alt="loading"
+              ></StyledLoading>
+            )}
+          </LogoWrapper>
           <HeaderAuthWrapper>
             <UserName>zxcjvklasjdfklaj</UserName>
             {isLogged ? (
@@ -43,6 +54,10 @@ const HeaderWrapper = styled.div`
 const HeaderContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const LogoWrapper = styled.div`
+  display: flex;
 `;
 
 const Logo = styled.div`
@@ -84,4 +99,10 @@ const LogoutButton = styled(DefaultButton)`
   margin: 0.2rem 1rem 0.2rem 0;
   padding: 0 0.5rem;
   background-color: rgba(0, 0, 0, 0);
+`;
+
+const StyledLoading = styled(Image)`
+  diplay: block;
+  width: 43px;
+  height: 43px;
 `;

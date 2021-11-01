@@ -1,9 +1,9 @@
-import { createAction, handleActions } from "redux-actions";
+import { createAction, createActions, handleActions } from "redux-actions";
 import { takeLatest, debounce } from "redux-saga/effects";
 import createRequestSaga, {
   createRequestActionTypes,
 } from "../../lib/createRequestSaga";
-import * as api from "../../lib/api/meta";
+import * as api from "../../lib/api/common";
 
 // 액션 타입 번들 생성
 const getActionTypes = () => {
@@ -42,8 +42,8 @@ export function request(dispatch, apiActionType, axiosConfig) {
 
 // 초기화 액션 생성 함수
 export function requestInit(dispatch, apiActionType) {
-  var INIT_TYPE = `${apiActionType}_INIT`;
-  dispatch({ type: INIT_TYPE });
+  var INIT_TYPE = `${apiActionType}_INIT`
+  dispatch({type: INIT_TYPE})
 }
 
 // 사가 생성

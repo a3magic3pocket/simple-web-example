@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+// Reference by : https://www.daleseo.com/react-forms-with-hooks/
 export default function useForm({ initialValues, onSubmit, validate }) {
   const [values, setValues] = useState(initialValues);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(initialValues);
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
@@ -19,6 +20,7 @@ export default function useForm({ initialValues, onSubmit, validate }) {
 
   useEffect(() => {
     if (submitting) {
+      console.log("errors", errors)
       if (Object.keys(errors).length === 0) {
         onSubmit(values);
       }

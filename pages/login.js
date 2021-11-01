@@ -7,30 +7,101 @@ import {
 } from "../components/common/layout";
 import { DefaultInput } from "../components/common/input";
 import { SubmitButton } from "../components/common/button";
-import { LoginWrapper } from "../components/login";
+import { LoginForm, LoginError } from "../components/login";
+import { useRouter } from "next/router";
+import useForm from "../hookes/form";
+import { request, requestInit } from "../modules/common/request";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { apiMeta } from "../lib/api/common";
+import { useEffect } from "react";
 
 export default function Login() {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  
+  const loginAPIActionType = "api/LOGIN";
+  const loginReducerKey = apiMeta[loginAPIActionType]["reducerKey"];
+  const { isLoading, result, error } = useSelector((state) => ({
+    isLoading: state.loading[loginAPIActionType],
+    result: state[loginReducerKey].result,
+    error: state[loginReducerKey].error,
+  }));
+
+  const { values, errors, submitting, handleChange, handleSubmit } = useForm({
+    initialValues: { UserName: "", Password: "" },
+    onSubmit: (values) => {
+      const data = JSON.stringify(values);
+      requestInit(dispatch, loginAPIActionType);
+      request(dispatch, loginAPIActionType, { data });
+    },
+    validate: (values) => {
+      const errors = {};
+
+      if (values.UserName < 8) {
+        errors.UserName = "8자 이상의 ID를 사용해야합니다.";
+      } else if (!/[A-z0-9-_]+/.test(values.UserName)) {
+        errors.UserName = "ID는 (알파벳, 숫자, -, _)만 사용할 수 있습니다.";
+      }
+
+      if (values.Password < 8) {
+        errors.Password = "8자 이상의 Password를 사용해야합니다.";
+      }
+
+      return errors;
+    },
+  });
+
+  useEffect(() => {
+    if (error) {
+      alert("ID 또는 Password가 틀렸습니다.");
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (result) {
+      alert("result", result);
+      requestInit(dispatch, loginAPIActionType);
+    }
+  }, [result]);
+
   return (
     <RootWrapperLayout>
-      <Header />
+      <Header isLoading={isLoading} />
       <DefaultLayout>
         <ContentLayout>
           <ContentWrapper>
             <Title>로그인</Title>
-            <LoginWrapper>
+            <LoginForm onSubmit={handleSubmit}>
               <InputWrapper>
-                <div>ID</div>
-                <Input type="text" />
+                <label htmlFor="login-id">ID</label>
+                <Input
+                  id="login-id"
+                  type="text"
+                  name="UserName"
+                  value={values.UserName}
+                  onChange={handleChange}
+                />
+                {errors.UserName && <LoginError>{errors.UserName}</LoginError>}
               </InputWrapper>
               <InputWrapper>
-                <div>Password</div>
-                <Input type="password" />
+                <label htmlFor="login-password">Password</label>
+                <Input
+                  id="login-password"
+                  type="password"
+                  name="Password"
+                  value={values.Password}
+                  onChange={handleChange}
+                />
+                {errors.Password && <LoginError>{errors.Password}</LoginError>}
               </InputWrapper>
-              <LoginButton>로그인</LoginButton>
+              <LoginButton type="submit" disabled={submitting}>
+                로그인
+              </LoginButton>
               <Signup>
-                <a href="#">회원가입</a>
+                <div onClick={() => router.push("/signup")}>회원가입</div>
               </Signup>
-            </LoginWrapper>
+            </LoginForm>
           </ContentWrapper>
         </ContentLayout>
       </DefaultLayout>
