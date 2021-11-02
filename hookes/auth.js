@@ -3,11 +3,11 @@ import { request, requestInit } from "../modules/common/request";
 import { apiMeta } from "../lib/api/common";
 import { useEffect } from "react";
 import { setIsLogged, setUserName } from "../modules/login";
+import { useRouter } from "next/router";
 
-export function useLogin() {
-  const { isLogged, userName } = useSelector((state) => ({
+export function updateLogin() {
+  const { isLogged } = useSelector((state) => ({
     isLogged: state["login"].isLogged,
-    userName: state["login"].userName,
   }));
 
   const dispatch = useDispatch();
@@ -64,15 +64,11 @@ export function useLogin() {
       requestInit(dispatch, userAPIActionType);
     }
   }, [userResult]);
-
-  return {
-    isLogged,
-    userName,
-  };
 }
 
 export function useLogout() {
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const logoutAPIActionType = "api/LOGOUT";
   const logoutReducerKey = apiMeta[logoutAPIActionType]["reducerKey"];
@@ -98,6 +94,8 @@ export function useLogout() {
       localStorage.removeItem("username");
       dispatch(setIsLogged(false));
       dispatch(setUserName(""));
+      requestInit(dispatch, logoutAPIActionType);
+      router.push("/");
     }
   }, [logoutResult]);
 

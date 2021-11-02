@@ -1,43 +1,21 @@
-import { ContentLayout, DefaultLayout, RootWrapperLayout } from "../components/common/layout";
+import styled from "styled-components";
+import { LoginButton } from "../components/common/login";
+import {
+  ContentLayout,
+  DefaultLayout,
+  RootWrapperLayout,
+} from "../components/common/layout";
+import Header from "../components/header";
 
 export default function Login() {
   return (
     <RootWrapperLayout>
-      <Header isLoading={isLoading} />
+      <Header />
       <DefaultLayout>
         <ContentLayout>
           <ContentWrapper>
-            <Title>로그인</Title>
-            <LoginForm onSubmit={handleSubmit}>
-              <InputWrapper>
-                <label htmlFor="login-id">ID</label>
-                <Input
-                  id="login-id"
-                  type="text"
-                  name="UserName"
-                  value={values.UserName}
-                  onChange={handleChange}
-                />
-                {errors.UserName && <LoginError>{errors.UserName}</LoginError>}
-              </InputWrapper>
-              <InputWrapper>
-                <label htmlFor="login-password">Password</label>
-                <Input
-                  id="login-password"
-                  type="password"
-                  name="Password"
-                  value={values.Password}
-                  onChange={handleChange}
-                />
-                {errors.Password && <LoginError>{errors.Password}</LoginError>}
-              </InputWrapper>
-              <LoginButton type="submit" disabled={submitting}>
-                로그인
-              </LoginButton>
-              <Signup>
-                <div onClick={() => router.push("/signup")}>회원가입</div>
-              </Signup>
-            </LoginForm>
+            <Title>로그인이 필요합니다.</Title>
+            <BigLoginButton>로그인</BigLoginButton>
           </ContentWrapper>
         </ContentLayout>
       </DefaultLayout>
@@ -51,4 +29,23 @@ const ContentWrapper = styled.div`
   justify-content: center;
   align-items: center;
   border: 1px solid black;
+`;
+
+const Title = styled.div`
+  display: flex;
+  margin: 1rem 1rem 0 1rem;
+  font-weight: bold;
+  font-size: 1.6rem;
+`;
+
+const BigLoginButton = styled(LoginButton)`
+  margin: 3rem 1rem 1rem 1rem;
+  background-color: rgba(180, 199, 231, 1);
+  width: 30rem;
+  height: 3rem;
+  @media screen and (max-width: 720px) {
+    width: 94%;
+    height: 3rem;
+  }
+  font-size: 1rem;
 `;

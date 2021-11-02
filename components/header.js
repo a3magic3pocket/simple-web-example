@@ -3,11 +3,14 @@ import { DefaultLayout } from "./common/layout";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { LoginButton, LogoutButton } from "./common/login";
-import { useLogin } from "../hookes/auth";
+import { useSelector } from "react-redux";
 
 export default function Header({ isLoading }) {
   const router = useRouter();
-  const { isLogged, userName } = useLogin();
+  const { isLogged, userName } = useSelector((state) => ({
+    isLogged: state["login"].isLogged,
+    userName: state["login"].userName,
+  }));
 
   return (
     <HeaderWrapper>

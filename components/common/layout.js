@@ -1,6 +1,12 @@
 import styled from "styled-components";
+import { updateLogin } from "../../hookes/auth";
 
-export const RootWrapperLayout = styled.div`
+export function RootWrapperLayout({className, children}) {
+  updateLogin();
+  return <RootWrapperLayoutStyle className={className}>{children}</RootWrapperLayoutStyle>;
+}
+
+export const RootWrapperLayoutStyle = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -29,4 +35,3 @@ export const ContentLayout = styled.div`
   min-height: 92vh;
   border: 1px solid black;
 `;
-
