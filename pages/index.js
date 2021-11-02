@@ -51,7 +51,7 @@ const Description = styled.div`
     font-size: 3.4rem;
   }
   @media screen and (max-width: 320px) {
-    font-size: 3.4rem;
+    font-size: 2.8rem;
   }
 `;
 

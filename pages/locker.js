@@ -23,12 +23,13 @@ export default function Locker() {
   const [selected, setSelected] = useState([]);
   const [lastSelected, setLastSelected] = useState(null);
   const [wantUpdate, setWantUpdate] = useState(false);
+  const [wantedLocation, setWantedLocation] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
   // 각 location의 locker 번호는 고유함
   const [lockers, setLockers] = useState({});
 
-  // 로커 조회
+  // +-- 로커 조회
   const listAPIActionType = "api/LOCKER_LIST";
   const listReducerKey = apiMeta[listAPIActionType]["reducerKey"];
 
@@ -62,7 +63,7 @@ export default function Locker() {
     }
   }, [listResult]);
 
-  // 401 unauthorized 에러 처리
+  // +-- 401 unauthorized 에러 처리
   const unauthorized = useSelector((state) => state.unauthorized.unauthorized);
   useEffect(() => {
     if (unauthorized) {
@@ -85,7 +86,7 @@ export default function Locker() {
     })
   );
 
-  // 새 구역에 로커 추가
+  // +-- 새 구역에 로커 추가
   const { values, errors, submitting, handleChange, handleSubmit } = useForm({
     initialValues: { Location: "" },
     onSubmit: (values) => {
@@ -141,7 +142,7 @@ export default function Locker() {
     setWantUpdate(!wantUpdate);
   };
 
-  // 로커 삭제
+  // +-- 로커 삭제
   const deleteAPIActionType = "api/DELETE_LOCKERS";
   const deleteReducerKey = apiMeta[deleteAPIActionType]["reducerKey"];
   const { deleteIsLoading, deleteResult, deleteError } = useSelector(
@@ -200,9 +201,42 @@ export default function Locker() {
     }
   }, [deleteError]);
 
+  // +-- 로커 변경
+  const updateAPIActionType = "api/UPDATE_LOCKERS";
+  const updateReducerKey = apiMeta[updateAPIActionType]["reducerKey"];
+  const { updateIsLoading, updateResult, updateError } = useSelector(
+    (state) => ({
+      updateIsLoading: state.loading[updateAPIActionType],
+      updateResult: state[updateReducerKey].result,
+      updateError: state[updateReducerKey].error,
+    })
+  );
+
   // handleUpdateLocation : 선택한 로커들(selected)의 구역(location) 갱신
-  const handleUpdateLocation = (wantedLocation) => {
+  const handleUpdateLocation = (location) => {
     console.log("in handleUpdateLocation");
+    const updateIDs = selected.map((row) => {
+      const [_, id] = JSON.parse(row);
+
+      return id;
+    });
+
+    const data = JSON.stringify({
+      Location: location,
+      UpdateIDs: updateIDs,
+    });
+
+    requestInit(dispatch, updateAPIActionType);
+    request(dispatch, updateAPIActionType, { data });
+    setWantedLocation(location)
+  };
+
+  // rerenderAfterUpdate : 변경에 성공하면 변경된 로커를 화면에 반영
+  const rerenderAfterUpdate = () => {
+    if (wantedLocation === null) {
+      return;
+    }
+
     let newLockers = { ...lockers };
     for (const i in selected) {
       const [location, id] = JSON.parse(selected[i]);
@@ -224,7 +258,20 @@ export default function Locker() {
     setLockers(newLockers);
     setSelected([]);
     setLastSelected(null);
+    setWantedLocation(null);
   };
+
+  useEffect(() => {
+    if (updateResult) {
+      rerenderAfterUpdate();
+    }
+  }, [updateResult]);
+
+  useEffect(() => {
+    if (updateError) {
+      alert("로커 변경 실패");
+    }
+  }, [updateError]);
 
   // getUpdateOrDeleteButtons :
   //  선택한 로커(selected)를 구역이동(update) 시킬지 삭제(delete) 할지 선택하는 버튼 노출
