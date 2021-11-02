@@ -9,18 +9,29 @@ import { DefaultInput } from "../components/common/input";
 import { DefaultButton } from "../components/common/button";
 import { useEffect, useState } from "react";
 import ReactModal from "react-modal";
-import { request, requestInit } from "../modules/common/request";
 import { useSelector, useDispatch } from "react-redux";
-import { apiMeta } from "../lib/api/common";
 import { useRouter } from "next/router";
 import { init401 } from "../modules/common/unauthorized";
+import { request, requestInit } from "../modules/common/request";
+import { apiMeta } from "../lib/api/common";
+import useForm from "../hookes/form";
 
 export default function Locker() {
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const [selected, setSelected] = useState([]);
+  const [lastSelected, setLastSelected] = useState(null);
+  const [wantUpdate, setWantUpdate] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  // 각 location의 locker 번호는 고유함
+  const [lockers, setLockers] = useState({});
+
+  // 로커 조회
   const listAPIActionType = "api/LOCKER_LIST";
   const listReducerKey = apiMeta[listAPIActionType]["reducerKey"];
+
   const { listIsLoading, listResult, listError } = useSelector((state) => ({
     listIsLoading: state.loading[listAPIActionType],
     listResult: state[listReducerKey].result,
@@ -32,28 +43,86 @@ export default function Locker() {
     request(dispatch, listAPIActionType, {});
   }, []);
 
+  useEffect(() => {
+    if (
+      listResult !== null &&
+      typeof listResult !== "undefined" &&
+      typeof listResult.data !== "undefined"
+    ) {
+      let newLockers = {};
+      for (const elem of listResult.data) {
+        const { ID: id, Location: location } = elem;
+        if (!Object.keys(newLockers).includes(location)) {
+          newLockers[location] = [id];
+        } else {
+          newLockers[location].push(id);
+        }
+      }
+      setLockers(newLockers);
+    }
+  }, [listResult]);
+
+  // 401 unauthorized 에러 처리
   const unauthorized = useSelector((state) => state.unauthorized.unauthorized);
   useEffect(() => {
     if (unauthorized) {
-      router.push({ pathname: "/login", query: { "before-path": router.pathname } });
+      router.push({
+        pathname: "/login",
+        query: { "before-path": router.pathname },
+      });
       dispatch(init401());
     }
   }, [unauthorized]);
 
-  const [selected, setSelected] = useState([]);
-  const [lastSelected, setLastSelected] = useState(null);
-  const [wantUpdate, setWantUpdate] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  // 새 로커 추가
+  const createAPIActionType = "api/CREATE_LOCKERS";
+  const createReducerKey = apiMeta[createAPIActionType]["reducerKey"];
+  const { createIsLoading, createResult, createError } = useSelector(
+    (state) => ({
+      createIsLoading: state.loading[createAPIActionType],
+      createResult: state[createReducerKey].result,
+      createError: state[createReducerKey].error,
+    })
+  );
 
-  // 각 location의 locker 번호는 고유함
-  const [lockers, setLockers] = useState({
-    A: [1, 5, 4],
-    B: [11, 12, 13, 14],
-    C: [222, 333, 777, 555],
-    D: [22, 33, 77, 55],
-    E: [2222, 3333, 7777, 5555],
-    F: [22222, 33333, 77777, 555555555],
+  // 새 구역에 로커 추가
+  const { values, errors, submitting, handleChange, handleSubmit } = useForm({
+    initialValues: { Location: "" },
+    onSubmit: (values) => {
+      const data = JSON.stringify([values]);
+      requestInit(dispatch, createAPIActionType);
+      request(dispatch, createAPIActionType, { data });
+      setIsOpen(!isOpen);
+    },
+    validate: (values) => {
+      console.log("come in validate?");
+      const errors = {};
+      if (values.Location === "") {
+        errors.Location = "구역을 입력하지 않았습니다.";
+      }
+
+      return errors;
+    },
+    clearInputs: true,
   });
+
+  // handleAdd : 기존 구역에 로커 추가
+  const handleAdd = (e, location) => {
+    const data = JSON.stringify([{Location: location}]);
+    requestInit(dispatch, createAPIActionType);
+    request(dispatch, createAPIActionType, { data });
+  };
+
+  useEffect(() => {
+    requestInit(dispatch, listAPIActionType);
+    request(dispatch, listAPIActionType, {});
+  }, [createResult]);
+
+  useEffect(() => {
+    if (createError) {
+      alert("로커 추가 실패");
+    }
+  }, [createError]);
 
   // handleSelect : 로커 선택 갱신
   const handleSelect = (stringifiedRow) => {
@@ -71,17 +140,6 @@ export default function Locker() {
   // handleWantUpdate: 구역변경 선택 여부 갱신
   const handleWantUpdate = () => {
     setWantUpdate(!wantUpdate);
-  };
-
-  // handleAdd : 입력 받은 구역(location)에 새 로커 추가
-  const handleAdd = (e, location) => {
-    // Temporary
-    const newBoxNum = lockers[location].length;
-    setLockers({
-      ...lockers,
-      [location]: [...lockers[location], newBoxNum],
-    });
-    console.log("location", location);
   };
 
   // handleDelete : 선택한 로커들(selected) 삭제
@@ -131,11 +189,6 @@ export default function Locker() {
     setLockers(newLockers);
     setSelected([]);
     setLastSelected(null);
-  };
-
-  // handleCreate : 새 로커 생성
-  const handleCreate = (e) => {
-    setIsOpen(!isOpen);
   };
 
   // getUpdateOrDeleteButtons :
@@ -198,7 +251,7 @@ export default function Locker() {
                 <LockerWrapper key={i}>
                   <LockerLocation>{location} 구역</LockerLocation>
                   <LockerBoxWrapper>
-                    <LockerBoxAdder onClick={(e) => handleAdd(e, location)}>
+                    <LockerBoxAdder onClick={(e) => handleAdd(e, location)} disabled={createIsLoading}>
                       +
                     </LockerBoxAdder>
                     {lockerBoxes}
@@ -218,17 +271,28 @@ export default function Locker() {
         </ContentLayout>
       </DefaultLayout>
 
-      {/* 새 로커 추가 모달 */}
+      {/* 새 구역에 로커 추가 모달 */}
       <StyledReactModal isOpen={isOpen} ariaHideApp={false}>
         <CreateClose onClick={() => setIsOpen(false)}>닫기</CreateClose>
         <CreateTitle>새 구역에 로커 추가</CreateTitle>
-        <CreateWrapper>
+        <CreateForm onSubmit={handleSubmit}>
           <CreateInputWrapper>
-            <div>구역</div>
-            <CreateInput />
+            <label htmlFor="create-locker-modal">구역</label>
+            <CreateInput
+              id="create-locker-modal"
+              type="text"
+              name="Location"
+              value={values.Location}
+              onChange={handleChange}
+            />
+            {errors.Location && (
+              <CreateLockerError>{errors.Location}</CreateLockerError>
+            )}
           </CreateInputWrapper>
-          <CreateSubmit onClick={handleCreate}>추가하기</CreateSubmit>
-        </CreateWrapper>
+          <CreateSubmit type="submit" disabled={submitting}>
+            추가하기
+          </CreateSubmit>
+        </CreateForm>
       </StyledReactModal>
     </RootWrapperLayout>
   );
@@ -396,7 +460,7 @@ const CreateTitle = styled(Title)`
   width: 90%;
 `;
 
-const CreateWrapper = styled.div`
+const CreateForm = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -422,4 +486,9 @@ const CreateSubmit = styled(DefaultButton)`
   height: 2rem;
   width: ${createComponentWidthP}%;
   margin-bottom: 1rem;
+`;
+
+const CreateLockerError = styled.div`
+  font-size: 0.8rem;
+  color: red;
 `;

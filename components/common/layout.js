@@ -6,7 +6,7 @@ export function RootWrapperLayout({className, children}) {
   return <RootWrapperLayoutStyle className={className}>{children}</RootWrapperLayoutStyle>;
 }
 
-export const RootWrapperLayoutStyle = styled.div`
+const RootWrapperLayoutStyle = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;

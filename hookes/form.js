@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 // Reference by : https://www.daleseo.com/react-forms-with-hooks/
-export default function useForm({ initialValues, onSubmit, validate }) {
+export default function useForm({ initialValues, onSubmit, validate, clearInputs=false }) {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState(initialValues);
   const [submitting, setSubmitting] = useState(false);
@@ -16,6 +16,9 @@ export default function useForm({ initialValues, onSubmit, validate }) {
     e.preventDefault();
     await new Promise((r) => setTimeout(r, 1000));
     setErrors(validate(values));
+    if (clearInputs) {
+      setValues(initialValues)
+    }
   };
 
   useEffect(() => {
