@@ -33,5 +33,4 @@ export const ContentLayout = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 92vh;
-  border: 1px solid black;
 `;

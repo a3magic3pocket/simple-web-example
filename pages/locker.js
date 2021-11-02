@@ -63,6 +63,12 @@ export default function Locker() {
     }
   }, [listResult]);
 
+  useEffect(() => {
+    if (listError) {
+      alert("로커 조회 실패");
+    }
+  }, [listError]);
+
   // +-- 401 unauthorized 에러 처리
   const unauthorized = useSelector((state) => state.unauthorized.unauthorized);
   useEffect(() => {
@@ -228,7 +234,7 @@ export default function Locker() {
 
     requestInit(dispatch, updateAPIActionType);
     request(dispatch, updateAPIActionType, { data });
-    setWantedLocation(location)
+    setWantedLocation(location);
   };
 
   // rerenderAfterUpdate : 변경에 성공하면 변경된 로커를 화면에 반영
@@ -321,7 +327,11 @@ export default function Locker() {
 
   return (
     <RootWrapperLayout>
-      <Header />
+      <Header
+        isLoading={
+          listIsLoading || createIsLoading || deleteIsLoading || updateIsLoading
+        }
+      />
       <DefaultLayout>
         <ContentLayout>
           <ContentWrapper>
@@ -347,9 +357,9 @@ export default function Locker() {
             <LockerWrapper>
               <LockerBoxWrapper>
                 <CreateTitle>새 구역에 로커 추가</CreateTitle>
-                <LockerBoxAdder onClick={() => setIsOpen(true)}>
+                <NewLockerBoxAdder onClick={() => setIsOpen(true)}>
                   +
-                </LockerBoxAdder>
+                </NewLockerBoxAdder>
               </LockerBoxWrapper>
             </LockerWrapper>
           </ContentWrapper>
@@ -388,7 +398,6 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
   width: 80%;
 `;
 
@@ -417,7 +426,8 @@ const LockerWrapper = styled.div`
 const LockerLocation = styled.div`
   display: flex;
   padding: 0.4rem;
-  background: olive;
+  background: silver;
+  border: 1px solid black;
 `;
 
 const LockerBoxWrapper = styled.div`
@@ -436,7 +446,7 @@ const LockerBox = styled.div`
   width: 48px;
   height: 48px;
   border: ${(props) =>
-    props.isSelected ? "3px solid red" : "1px solid black"};
+    props.isSelected ? "4px solid black" : "1px solid black"};
   margin: 1rem 1rem;
   background: yellow;
 `;
@@ -452,7 +462,15 @@ const LockerBoxNum = styled.div`
 `;
 
 const LockerBoxAdder = styled(LockerBox)`
-  background: red;
+  background: black;
+  color: white;
+`;
+
+const NewLockerBoxAdder = styled(LockerBox)`
+  background: black;
+  color: white;
+  width: 96px;
+  height: 96px;
 `;
 
 // Reference by : https://projects.verou.me/bubbly/
