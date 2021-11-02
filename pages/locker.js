@@ -95,7 +95,6 @@ export default function Locker() {
       setIsOpen(!isOpen);
     },
     validate: (values) => {
-      console.log("come in validate?");
       const errors = {};
       if (values.Location === "") {
         errors.Location = "구역을 입력하지 않았습니다.";
@@ -108,7 +107,7 @@ export default function Locker() {
 
   // handleAdd : 기존 구역에 로커 추가
   const handleAdd = (e, location) => {
-    const data = JSON.stringify([{Location: location}]);
+    const data = JSON.stringify([{ Location: location }]);
     requestInit(dispatch, createAPIActionType);
     request(dispatch, createAPIActionType, { data });
   };
@@ -142,9 +141,33 @@ export default function Locker() {
     setWantUpdate(!wantUpdate);
   };
 
+  // 로커 삭제
+  const deleteAPIActionType = "api/DELETE_LOCKERS";
+  const deleteReducerKey = apiMeta[deleteAPIActionType]["reducerKey"];
+  const { deleteIsLoading, deleteResult, deleteError } = useSelector(
+    (state) => ({
+      deleteIsLoading: state.loading[deleteAPIActionType],
+      deleteResult: state[deleteReducerKey].result,
+      deleteError: state[deleteReducerKey].error,
+    })
+  );
+
   // handleDelete : 선택한 로커들(selected) 삭제
   const handleDelete = () => {
     console.log("in handleDelete");
+    const data = JSON.stringify(
+      selected.map((row) => {
+        const [location, id] = JSON.parse(row);
+
+        return { ID: id, Location: location };
+      })
+    );
+    requestInit(dispatch, deleteAPIActionType);
+    request(dispatch, deleteAPIActionType, { data });
+  };
+
+  // rerenderAfterDelete : 삭제에 성공하면 삭제된 로커를 화면에서 제거
+  const rerenderAfterDelete = () => {
     let newLockers = { ...lockers };
     for (const i in selected) {
       const [location, id] = JSON.parse(selected[i]);
@@ -164,6 +187,18 @@ export default function Locker() {
     setSelected([]);
     setLastSelected(null);
   };
+
+  useEffect(() => {
+    if (deleteResult) {
+      rerenderAfterDelete();
+    }
+  }, [deleteResult]);
+
+  useEffect(() => {
+    if (deleteError) {
+      alert("로커 삭제 실패");
+    }
+  }, [deleteError]);
 
   // handleUpdateLocation : 선택한 로커들(selected)의 구역(location) 갱신
   const handleUpdateLocation = (wantedLocation) => {
@@ -251,7 +286,10 @@ export default function Locker() {
                 <LockerWrapper key={i}>
                   <LockerLocation>{location} 구역</LockerLocation>
                   <LockerBoxWrapper>
-                    <LockerBoxAdder onClick={(e) => handleAdd(e, location)} disabled={createIsLoading}>
+                    <LockerBoxAdder
+                      onClick={(e) => handleAdd(e, location)}
+                      disabled={createIsLoading}
+                    >
                       +
                     </LockerBoxAdder>
                     {lockerBoxes}
