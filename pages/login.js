@@ -6,8 +6,21 @@ import {
   RootWrapperLayout,
 } from "../components/common/layout";
 import Header from "../components/header";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 export default function Login() {
+  const router = useRouter();
+  const isLogged = useSelector((state) => state["login"].isLogged);
+
+  useEffect(() => {
+    const beforePath = router.query["before-path"];
+    if (isLogged && typeof beforePath !== "undefined") {
+      router.push(beforePath)
+    }
+  }, [isLogged]);
+
   return (
     <RootWrapperLayout>
       <Header />

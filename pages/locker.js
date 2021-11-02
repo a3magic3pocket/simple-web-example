@@ -12,8 +12,11 @@ import ReactModal from "react-modal";
 import { request, requestInit } from "../modules/common/request";
 import { useSelector, useDispatch } from "react-redux";
 import { apiMeta } from "../lib/api/common";
+import { useRouter } from "next/router";
+import { init401 } from "../modules/common/unauthorized";
 
 export default function Locker() {
+  const router = useRouter();
   const dispatch = useDispatch();
 
   const listAPIActionType = "api/LOCKER_LIST";
@@ -28,6 +31,14 @@ export default function Locker() {
     requestInit(dispatch, listAPIActionType);
     request(dispatch, listAPIActionType, {});
   }, []);
+
+  const unauthorized = useSelector((state) => state.unauthorized.unauthorized);
+  useEffect(() => {
+    if (unauthorized) {
+      router.push({ pathname: "/login", query: { "before-path": "/locker" } });
+      dispatch(init401());
+    }
+  }, [unauthorized]);
 
   const [selected, setSelected] = useState([]);
   const [lastSelected, setLastSelected] = useState(null);
