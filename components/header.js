@@ -1,28 +1,13 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
-import { DefaultButton } from "./common/button";
 import { DefaultLayout } from "./common/layout";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { LoginButton, LogoutButton } from "./common/login";
+import { useLogin } from "../hookes/auth";
 
 export default function Header({ isLoading }) {
-  const [isLogged, setIsLogged] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    window.addEventListener("storage", function() {
-      const a = localStorage.getItem("login")
-      console.log("a", a)
-    }, false)
-  })
-
-  const handleLogin = () => {
-    const new_window = window.open(
-      "//localhost:8080/login?redirect-url=localhost:3000/check",
-      "SIMPLE-LOCKER login",
-      "scrollbars=no,width=320,height=400,menubar=false,resizable=yes"
-    );
-  };
+  const { isLogged, userName } = useLogin();
 
   return (
     <HeaderWrapper>
@@ -44,11 +29,11 @@ export default function Header({ isLoading }) {
             )}
           </LogoWrapper>
           <HeaderAuthWrapper>
-            <UserName>zxcjvklasjdfklaj</UserName>
+            <UserName>{userName}</UserName>
             {isLogged ? (
-              <LogoutButton>로그아웃</LogoutButton>
+              <HeaderLogoutButton>로그아웃</HeaderLogoutButton>
             ) : (
-              <LoginButton onClick={() => handleLogin()}>로그인</LoginButton>
+              <HeaderLoginButton>로그인</HeaderLoginButton>
             )}
           </HeaderAuthWrapper>
         </HeaderContentWrapper>
@@ -103,17 +88,19 @@ const UserName = styled.div`
   }
 `;
 
-const LoginButton = styled(DefaultButton)`
+const HeaderLoginButton = styled(LoginButton)`
   margin: 0.5rem 1rem 0.5rem 0;
   padding: 0 0.5rem;
   background-color: rgba(180, 199, 231, 1);
   font-size: 1rem;
 `;
 
-const LogoutButton = styled(DefaultButton)`
+const HeaderLogoutButton = styled(LogoutButton)`
   margin: 0.2rem 1rem 0.2rem 0;
   padding: 0 0.5rem;
   background-color: rgba(0, 0, 0, 0);
+  border: 1px solid black;
+  font-size: 1rem;
 `;
 
 const StyledLoading = styled(Image)`

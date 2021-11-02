@@ -7,15 +7,32 @@ import {
 } from "../components/common/layout";
 import { DefaultInput } from "../components/common/input";
 import { DefaultButton } from "../components/common/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactModal from "react-modal";
+import { request, requestInit } from "../modules/common/request";
+import { useSelector, useDispatch } from "react-redux";
+import { apiMeta } from "../lib/api/common";
 
 export default function Locker() {
+  const dispatch = useDispatch();
+
+  const listAPIActionType = "api/LOCKER_LIST";
+  const listReducerKey = apiMeta[listAPIActionType]["reducerKey"];
+  const { listIsLoading, listResult, listError } = useSelector((state) => ({
+    listIsLoading: state.loading[listAPIActionType],
+    listResult: state[listReducerKey].result,
+    listError: state[listReducerKey].error,
+  }));
+
+  useEffect(() => {
+    requestInit(dispatch, listAPIActionType);
+    request(dispatch, listAPIActionType, {});
+  }, []);
+
   const [selected, setSelected] = useState([]);
   const [lastSelected, setLastSelected] = useState(null);
   const [wantUpdate, setWantUpdate] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [newLocker, setNewLocker] = useState({});
 
   // 각 location의 locker 번호는 고유함
   const [lockers, setLockers] = useState({
