@@ -35,7 +35,7 @@ export default function Locker() {
   const unauthorized = useSelector((state) => state.unauthorized.unauthorized);
   useEffect(() => {
     if (unauthorized) {
-      router.push({ pathname: "/login", query: { "before-path": "/locker" } });
+      router.push({ pathname: "/login", query: { "before-path": router.pathname } });
       dispatch(init401());
     }
   }, [unauthorized]);

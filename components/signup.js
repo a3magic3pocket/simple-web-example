@@ -13,7 +13,7 @@ export const LoginForm = styled.form`
 
 export const SignupForm = styled(LoginForm)``;
 
-export const LoginError = styled.div`
+export const SignupError = styled.div`
   font-size: 0.8rem;
   color: red;
 `;

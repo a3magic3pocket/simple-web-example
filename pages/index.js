@@ -64,4 +64,5 @@ const StartButton = styled(DefaultButton)`
   font-size: 2rem;
   padding: 0.5rem 1rem;
   background-color: rgba(68, 114, 196, 1);
+  color: white;
 `;
