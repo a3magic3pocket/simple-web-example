@@ -6,5 +6,5 @@ export default function Check() {
     window.close();
   });
 
-  return <button>dd</button>;
+  return <></>;
 }

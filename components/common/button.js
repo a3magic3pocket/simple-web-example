@@ -9,7 +9,6 @@ export const DefaultButton = styled.button`
 `;
 
 export const SubmitButton = styled(DefaultButton)`
-  diplay: flex;
   color: white;
   font-size: 1rem;
   background: rgb(68, 114, 196);
