@@ -11,4 +11,6 @@ RUN sed -i -e 's/security.ubuntu.com/mirror.kakao.com/g' /etc/apt/sources.list
 RUN npm install
 RUN npm run build
 
+RUN npm test
+
 ENTRYPOINT npm run start
