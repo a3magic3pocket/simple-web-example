@@ -14,19 +14,19 @@ spec:
     spec:
       containers:
         - name: simple-web
-          image: a3magic3pocket/simple-web:0.0.2
+          image: a3magic3pocket/simple-web:0.0.3
           ports:
             - containerPort: 3000
-        - env:
+          env:
             - name: BACKEND_ORIGIN
               valueFrom:
                 configMapKeyRef:
-                  name: simple-api
+                  name: simple-web
                   key: backendOrigin
             - name: FRONTEND_ORIGIN
               valueFrom:
                 configMapKeyRef:
-                  name: simple-api
+                  name: simple-web
                   key: frontendOrigin
 ---
 apiVersion: v1
