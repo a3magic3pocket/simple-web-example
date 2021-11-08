@@ -64,7 +64,11 @@ export default function Locker() {
   }, [listResult]);
 
   useEffect(() => {
-    if (listError) {
+    if (
+      listError !== null &&
+      typeof listError.response !== "undefined" &&
+      listError.response.status !== 401
+    ) {
       alert("로커 조회 실패");
     }
   }, [listError]);

@@ -6,7 +6,7 @@ import createRequestSaga, {
 import * as api from "../../lib/api/common";
 
 // 액션 타입 번들 생성
-const getActionTypes = () => {
+export const getActionTypes = () => {
   const baseTypes = [];
   const successTypes = [];
   const failureTypes = [];
