@@ -4,7 +4,6 @@ export default function CustomHead({ title, description }) {
   const joinedTitle = `SIMPLE-LOCKER - ${title}`;
   return (
     <Head>
-      <meta charset="utf-8" />
       <title>{joinedTitle}</title>
       <meta name="author" content="a3magic3pocket" />
       <meta name="description" content={description} />
