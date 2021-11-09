@@ -81,6 +81,10 @@ export default function Signup() {
 
   return (
     <RootWrapperLayout>
+      <CustomHead
+        title="SINGUP"
+        description="SIMPLE-LOCKER 회원가입 페이지"
+      />
       <Header isLoading={isLoading} />
       <DefaultLayout>
         <ContentLayout>

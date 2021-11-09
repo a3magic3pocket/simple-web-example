@@ -15,6 +15,7 @@ import { init401 } from "../modules/common/unauthorized";
 import { request, requestInit } from "../modules/common/request";
 import { apiMeta } from "../lib/api/common";
 import useForm from "../hookes/form";
+import CustomHead from "../components/head";
 
 export default function Locker() {
   const router = useRouter();
@@ -30,6 +31,19 @@ export default function Locker() {
   const [lockers, setLockers] = useState({});
 
   // +-- 로커 조회
+  const rerenderAfterRetrieve = (data) => {
+    let newLockers = {};
+    for (const elem of data) {
+      const { ID: id, Location: location } = elem;
+      if (!Object.keys(newLockers).includes(location)) {
+        newLockers[location] = [id];
+      } else {
+        newLockers[location].push(id);
+      }
+    }
+    setLockers(newLockers);
+  };
+
   const listAPIActionType = "api/LOCKER_LIST";
   const listReducerKey = apiMeta[listAPIActionType]["reducerKey"];
 
@@ -50,16 +64,7 @@ export default function Locker() {
       typeof listResult !== "undefined" &&
       typeof listResult.data !== "undefined"
     ) {
-      let newLockers = {};
-      for (const elem of listResult.data) {
-        const { ID: id, Location: location } = elem;
-        if (!Object.keys(newLockers).includes(location)) {
-          newLockers[location] = [id];
-        } else {
-          newLockers[location].push(id);
-        }
-      }
-      setLockers(newLockers);
+      rerenderAfterRetrieve(listResult.data);
     }
   }, [listResult]);
 
@@ -124,8 +129,10 @@ export default function Locker() {
   };
 
   useEffect(() => {
-    requestInit(dispatch, listAPIActionType);
-    request(dispatch, listAPIActionType, {});
+    if (createResult) {
+      requestInit(dispatch, listAPIActionType);
+      request(dispatch, listAPIActionType, {});
+    }
   }, [createResult]);
 
   useEffect(() => {
@@ -337,6 +344,7 @@ export default function Locker() {
 
   return (
     <RootWrapperLayout>
+      <CustomHead title="LOCKER" description="SIMPLE-LOCKER LOCKER 페이지" />
       <Header isLoading={isLoading} />
       <DefaultLayout>
         <ContentLayout>

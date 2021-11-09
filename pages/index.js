@@ -7,12 +7,14 @@ import {
 import styled from "styled-components";
 import { DefaultButton } from "../components/common/button";
 import { useRouter } from "next/router";
+import CustomHead from "../components/head";
 
 export default function Home() {
   const router = useRouter();
 
   return (
     <RootWrapperLayout>
+      <CustomHead title="MAIN" description="SIMPLE-LOCKER 메인 페이지" />
       <Header />
       <DefaultLayout>
         <HomeContentLayout>
