@@ -9,6 +9,7 @@ import Header from "../components/header";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import CustomHead from "../components/head";
 
 export default function Login() {
   const router = useRouter();
@@ -17,12 +18,13 @@ export default function Login() {
   useEffect(() => {
     const beforePath = router.query["before-path"];
     if (isLogged && typeof beforePath !== "undefined") {
-      router.push(beforePath)
+      router.push(beforePath);
     }
   }, [isLogged]);
 
   return (
     <RootWrapperLayout>
+      <CustomHead title="LOGIN" description="SIMPLE-LOCKER 로그인 페이지" />
       <Header />
       <DefaultLayout>
         <ContentLayout>
