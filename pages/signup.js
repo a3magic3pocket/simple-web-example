@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useForm from "../hookes/form";
 import { request, requestInit } from "../modules/common/request";
 import { apiMeta } from "../lib/api/common";
+import CustomHead from "../components/head";
 
 export default function Signup() {
   const router = useRouter();
@@ -81,10 +82,7 @@ export default function Signup() {
 
   return (
     <RootWrapperLayout>
-      <CustomHead
-        title="SINGUP"
-        description="SIMPLE-LOCKER 회원가입 페이지"
-      />
+      <CustomHead title="SINGUP" description="SIMPLE-LOCKER 회원가입 페이지" />
       <Header isLoading={isLoading} />
       <DefaultLayout>
         <ContentLayout>
