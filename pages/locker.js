@@ -312,7 +312,7 @@ export default function Locker() {
   );
 
   // getLockerBoxes : 로커 박스 획득
-  const getLockerBoxes = (location, boxNums) =>
+  const getLockerBoxes = (location, boxNums, isLoading) =>
     boxNums.map((box, i) => {
       const stringified = JSON.stringify([location, box]);
       return (
@@ -322,27 +322,29 @@ export default function Locker() {
             getUpdateOrDeleteButtons()}
 
           {wantUpdate && lastSelected === stringified && getUpdateSelections()}
-          <LockerBoxNum onClick={() => handleSelect(stringified)}>
+          <LockerBoxNum
+            onClick={() => handleSelect(stringified)}
+            isLoading={isLoading}
+          >
             {box}
           </LockerBoxNum>
         </LockerBox>
       );
     });
 
+  const isLoading =
+    listIsLoading || createIsLoading || deleteIsLoading || updateIsLoading;
+
   return (
     <RootWrapperLayout>
-      <Header
-        isLoading={
-          listIsLoading || createIsLoading || deleteIsLoading || updateIsLoading
-        }
-      />
+      <Header isLoading={isLoading} />
       <DefaultLayout>
         <ContentLayout>
           <ContentWrapper>
             <Title>로커(Locker) 관리</Title>
             {Object.entries(lockers).map((locker, i) => {
               const [location, boxNums] = locker;
-              const lockerBoxes = getLockerBoxes(location, boxNums);
+              const lockerBoxes = getLockerBoxes(location, boxNums, isLoading);
               return (
                 <LockerWrapper key={i}>
                   <LockerLocation>{location} 구역</LockerLocation>
@@ -463,6 +465,7 @@ const LockerBoxNum = styled.div`
   white-space: pre-wrap;
   width: 100%;
   height: 100%;
+  ${(props) => props.isLoading && "pointer-events:none;"}
 `;
 
 const LockerBoxAdder = styled(LockerBox)`
