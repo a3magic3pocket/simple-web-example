@@ -2,7 +2,7 @@
 
 ## 설명
 
-- 간단한 로커 관리 서비스([simple locker](https://isthereanymerch.com))의 web front 입니다.
+- 간단한 로커 관리 서비스([simple locker](https://www.coinlocker.link))의 web front 입니다.
 
 ## 의존성 패키지 설치
 
