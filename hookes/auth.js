@@ -3,7 +3,9 @@ import { request, requestInit } from "../modules/common/request";
 import { apiMeta } from "../lib/api/common";
 import { useEffect } from "react";
 import { setIsLogged, setUserName } from "../modules/login";
+import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
+import { getCandidateDomains, getCookiExpires } from "../utils/cookie";
 
 export function updateLogin() {
   const { isLogged } = useSelector((state) => ({
@@ -17,6 +19,9 @@ export function updateLogin() {
     userResult: state[userReducerKey].result,
   }));
 
+  const [cookies, setCookie, removeCookie] = useCookies();
+
+  /*
   // 로그인 성공 시, isLogged 갱신
   // (다른 window에서 localStorage 조작했을 때에만 발동)
   useEffect(() => {
@@ -26,7 +31,7 @@ export function updateLogin() {
         if (e.key !== "login") {
           return;
         }
-        const loginLS = localStorage.getItem("login");
+        const loginLS = cookies["login"];
         if (loginLS === "success") {
           dispatch(setIsLogged(true));
         }
@@ -34,11 +39,12 @@ export function updateLogin() {
       false
     );
   }, []);
+  */
 
   // 사용자가 브라우저 종료 후 재접속한 경우, 로그인 처리
   useEffect(() => {
-    const loginLS = localStorage.getItem("login");
-    const userNameLS = localStorage.getItem("username");
+    const loginLS = cookies["login"];
+    const userNameLS = cookies["username"];
     if (loginLS !== "success") {
       return;
     }
@@ -51,7 +57,7 @@ export function updateLogin() {
     }
   }, [isLogged]);
 
-  // 유저 정보 조회로 username을 획득한 경우, localstorage에 username 저장
+  // 유저 정보 조회로 username을 획득한 경우, 쿠키에 username 저장
   useEffect(() => {
     if (
       userResult !== null &&
@@ -60,7 +66,15 @@ export function updateLogin() {
       typeof userResult.data.UserName !== "undefined"
     ) {
       dispatch(setUserName(userResult.data.UserName));
-      localStorage.setItem("username", userResult.data.UserName);
+
+      const expires = getCookiExpires(720);
+      const options = {
+        path: "/",
+        domain,
+        expires: expires,
+      };
+      setCookie("username", userResult.data.UserName, options);
+
       requestInit(dispatch, userAPIActionType);
     }
   }, [userResult]);
@@ -90,8 +104,15 @@ export function useLogout() {
 
   useEffect(() => {
     if (logoutResult !== null && typeof logoutResult.data !== "undefined") {
-      localStorage.removeItem("login");
-      localStorage.removeItem("username");
+      const domains = getCandidateDomains();
+      for (const domain of domains) {
+        removeCookie("login", {
+          path: "/",
+          domain,
+        });
+      }
+      removeCookie("username");
+
       dispatch(setIsLogged(false));
       dispatch(setUserName(""));
       requestInit(dispatch, logoutAPIActionType);
