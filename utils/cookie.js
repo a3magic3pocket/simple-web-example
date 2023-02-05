@@ -8,7 +8,7 @@ export const getCookiExpires = (min) => {
 
 export const getCandidateDomains = () => {
   const firstPart = location.hostname.substring(0, 4);
-  const isWwwContained = firstPart === "www";
+  const isWwwContained = firstPart === "www.";
 
   if (isWwwContained) {
     return [location.hostname, location.hostname.replace("www.", "")];
