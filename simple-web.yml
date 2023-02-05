@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: simple-web
-          image: a3magic3pocket/simple-web:0.0.15
+          image: a3magic3pocket/simple-web:0.0.16
           ports:
             - containerPort: 3000
           env:
