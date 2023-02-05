@@ -3,9 +3,8 @@ import { request, requestInit } from "../modules/common/request";
 import { apiMeta } from "../lib/api/common";
 import { useEffect } from "react";
 import { setIsLogged, setUserName } from "../modules/login";
-import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
-import { getCandidateDomains, getCookiExpires } from "../utils/cookie";
+import { deleteCookie, getCandidateDomains, getCookie, getCookiExpires, setCookie } from "../utils/cookie";
 
 export function updateLogin() {
   const { isLogged } = useSelector((state) => ({
@@ -19,41 +18,37 @@ export function updateLogin() {
     userResult: state[userReducerKey].result,
   }));
 
-  const [cookies, setCookie, removeCookie] = useCookies();
-
-  /*
   // 로그인 성공 시, isLogged 갱신
   // (다른 window에서 localStorage 조작했을 때에만 발동)
   useEffect(() => {
     window.addEventListener(
       "storage",
       function (e) {
-        if (e.key !== "login") {
+        if (e.key !== "trigger") {
           return;
         }
-        const loginLS = cookies["login"];
-        if (loginLS === "success") {
+        const loginLS = getCookie('login');
+        if (loginLS === "success" && !isLogged) {
           dispatch(setIsLogged(true));
         }
       },
       false
     );
   }, []);
-  */
 
   // 사용자가 브라우저 종료 후 재접속한 경우, 로그인 처리
   useEffect(() => {
-    const loginLS = cookies["login"];
-    const userNameLS = cookies["username"];
+    const loginLS = getCookie('login');
+    const userNameLS = getCookie('username');
     if (loginLS !== "success") {
       return;
     }
 
     dispatch(setIsLogged(true));
-    if (userNameLS === null) {
-      request(dispatch, userAPIActionType, {});
-    } else {
+    if (userNameLS) {
       dispatch(setUserName(userNameLS));
+    } else {
+      request(dispatch, userAPIActionType, {});
     }
   }, [isLogged]);
 
@@ -70,7 +65,6 @@ export function updateLogin() {
       const expires = getCookiExpires(720);
       const options = {
         path: "/",
-        domain,
         expires: expires,
       };
       setCookie("username", userResult.data.UserName, options);
@@ -106,12 +100,12 @@ export function useLogout() {
     if (logoutResult !== null && typeof logoutResult.data !== "undefined") {
       const domains = getCandidateDomains();
       for (const domain of domains) {
-        removeCookie("login", {
+        deleteCookie("login", {
           path: "/",
           domain,
         });
       }
-      removeCookie("username");
+      deleteCookie("username");
 
       dispatch(setIsLogged(false));
       dispatch(setUserName(""));

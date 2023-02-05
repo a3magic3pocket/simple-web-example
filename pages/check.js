@@ -1,11 +1,9 @@
 import { useEffect } from "react";
-import { useCookies } from "react-cookie";
-import { getCandidateDomains, getCookiExpires } from "../utils/cookie";
+import { getCandidateDomains, getCookiExpires, setCookie } from "../utils/cookie";
 
 export default function Check() {
-  const [cookies, setCookie] = useCookies();
 
-  useEffect(() => {
+  useEffect(async () => {
     const expires = getCookiExpires(720);
 
     const domains = getCandidateDomains();
@@ -18,8 +16,10 @@ export default function Check() {
       setCookie("login", "success", options);
     }
 
+    localStorage.setItem("trigger", Math.random());
+
     window.close();
-  });
+  }, []);
 
   return <></>;
 }
