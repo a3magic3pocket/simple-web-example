@@ -4,7 +4,7 @@ import { apiMeta } from "../lib/api/common";
 import { useEffect } from "react";
 import { setIsLogged, setUserName } from "../modules/login";
 import { useRouter } from "next/router";
-import { deleteCookie, getCandidateDomains, getCookie, getCookiExpires, setCookie } from "../utils/cookie";
+import { deleteCookie, getDomain, getCookie, getCookiExpires, setCookie } from "../utils/cookie";
 
 export function updateLogin() {
   const { isLogged } = useSelector((state) => ({
@@ -27,7 +27,7 @@ export function updateLogin() {
         if (e.key !== "trigger") {
           return;
         }
-        const loginLS = getCookie('login');
+        const loginLS = getCookie('front-login');
         if (loginLS === "success" && !isLogged) {
           dispatch(setIsLogged(true));
         }
@@ -38,7 +38,7 @@ export function updateLogin() {
 
   // 사용자가 브라우저 종료 후 재접속한 경우, 로그인 처리
   useEffect(() => {
-    const loginLS = getCookie('login');
+    const loginLS = getCookie('front-login');
     const userNameLS = getCookie('username');
     if (loginLS !== "success") {
       return;
@@ -98,13 +98,10 @@ export function useLogout() {
 
   useEffect(() => {
     if (logoutResult !== null && typeof logoutResult.data !== "undefined") {
-      const domains = getCandidateDomains();
-      for (const domain of domains) {
-        deleteCookie("login", {
-          path: "/",
-          domain,
-        });
-      }
+      deleteCookie("front-login", {
+        path: "/",
+        domain: getDomain(),
+      });
       deleteCookie("username");
 
       dispatch(setIsLogged(false));
