@@ -15,7 +15,7 @@ export function LoginButton({ className, children }) {
     var top = ((height / 2) - (h / 2)) + dualScreenTop;
 
     window.open(
-      `//${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/login?redirect-url=${process.env.NEXT_PUBLIC_FRONTEND_ORIGIN}/check`,
+      `//${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/login?redirect-url=${location.host}/check`,
       "SIMPLE-LOCKER login",
       `scrollbars=no,width=${w},height=${h},menubar=false,resizable=yes,top=${top},left=${left}`
     );
