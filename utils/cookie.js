@@ -6,15 +6,17 @@ export const getCookiExpires = (min) => {
   return date;
 }
 
-export const getCandidateDomains = () => {
-  const firstPart = location.hostname.substring(0, 4);
-  const isWwwContained = firstPart === "www.";
-
-  if (isWwwContained) {
-    return [location.hostname, location.hostname.replace("www.", "")];
+export const getDomain = () => {
+  if (location.hostname === 'localhost') {
+    return location.hostname;
+  }
+  
+  const splitted = location.hostname.split('.');
+  if (splitted.length === 3) {
+    return '.' + splitted[1] + '.' + splitted[2];
   }
 
-  return [`www.${location.hostname}`, location.hostname];
+  return '.' + location.hostname;
 };
 
 // Reference by: https://ko.javascript.info/cookie
