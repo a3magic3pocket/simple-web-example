@@ -10,7 +10,7 @@ export const getDomain = () => {
   if (location.hostname === 'localhost') {
     return location.hostname;
   }
-  
+
   const splitted = location.hostname.split('.');
   if (splitted.length === 3) {
     return '.' + splitted[1] + '.' + splitted[2];
@@ -54,8 +54,9 @@ export function getCookie(name) {
   return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
-export  function deleteCookie(name) {
+export  function deleteCookie(name, options = {}) {
   setCookie(name, "", {
+    ...options,
     'max-age': -1
   })
 }
